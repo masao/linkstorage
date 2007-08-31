@@ -3,10 +3,12 @@
 
 require "test/unit"
 require "ftools"
+require "pathname"
 
 require "client.rb"
 
-user, passwd = open(".localhost.passwd").read.chomp.split(/:/)
+PASSWD_FILE = Pathname.new(__FILE__).dirname.join(".localhost.passwd")
+USER, PASSWD = open(PASSWD_FILE).read.chomp.split(/:/)
 
 class TC_CLIENT < Test::Unit::TestCase
    def setup
@@ -18,10 +20,13 @@ class TC_CLIENT < Test::Unit::TestCase
       assert( client )
    end
    def test_store
-      client = LinkStorage::Client.new( "http://localhost/~masao/private/cvswork/linkstorage/api.cgi/example", user, passwd )
+      client = LinkStorage::Client.new( "http://localhost/~masao/private/cvswork/linkstorage/api.cgi/example", USER, PASSWD )
       set = [ 1, 2, 3 ]
       response = client.save( set )
-      puts response.body
+      assert_equal( "200", response.code, "HTTP status code" )
+      set << 4
+      response = client.save( set )
+      #puts response.body
       assert_equal( "200", response.code, "HTTP status code" )
    end
 end
