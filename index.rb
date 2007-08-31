@@ -26,7 +26,7 @@ module LinkStorage
             raise "unknown operation"
          end
          raise APIError, "unknown error while API processing." if xml.nil?
-         print @cgi.header( 'status' => CGI::HTTP_STATUS['SERVER_ERROR'],
+         print @cgi.header( 'status' => CGI::HTTP_STATUS['OK'],
                             'type' => 'text/xml' )
          @cgi.print( xml )
       end
