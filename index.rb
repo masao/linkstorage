@@ -5,33 +5,47 @@ require "cgi"
 require "db"
 
 module LinkStorage
-   def to_xml( aid, set, delegate )
-      set_xml = set.map do |e|
-         "<e>#{ CGI.escapeHTML( e ) }</e>"
+   class API
+      def initialize( cgi )
+         @cgi = cgi
+         @namespace = @cgi.path_info
+         raise APIError, "empty namespace" if @namespace.nil?
+         @namespace = @namespace[1..-1] if @namespace[0] == ?/
+         @db = LinkStorage::DB.new( @namespace )
       end
-      <<EOF
-<?xml version="1.0"?><LinkStorage><set id="#{ CGI.escapeHTML( aid ) }">#{ set_xml }</set><delegate>#{ CGI.escapeHTML( delegate ) }</delegate></LinkStorage>
+      def process
+         case @cgi.request_method
+         when "POST" # store/update
+            set = @cgi.params[ "set" ]
+            delegate = @cgi.params[ "delegate" ][0]
+            #STDERR.puts [ set, delegate ].inspect
+            aid, set, delegate = @db.store( set, delegate )
+            xml = to_xml( aid, set, delegate )
+         when "GET"  # query
+         else
+            raise "unknown operation"
+         end
+         raise APIError, "unknown error while API processing." if xml.nil?
+         print @cgi.header( 'status' => CGI::HTTP_STATUS['SERVER_ERROR'],
+                            'type' => 'text/xml' )
+         @cgi.print( xml )
+      end
+      def to_xml( aid, set, delegate )
+         set_xml = set.map do |e|
+            "<e>#{ CGI.escapeHTML( e ) }</e>"
+         end.join
+         <<EOF
+<?xml version="1.0"?><LinkStorage><set id="#{ aid }">#{ set_xml }</set><delegate>#{ CGI.escapeHTML( delegate ) }</delegate></LinkStorage>
 EOF
+      end
    end
+   class APIError < Exception; end
 end
 
 begin
    @cgi = CGI.new
-   namespace = @cgi.path_info
-   db = LinkStorage::DB.new( namespace )
-   case @cgi.request_method
-   when "POST" # store/update
-      set = @cgi.params[ "set" ]
-      delegate = @cgi.params[ "delegate" ][0]
-      aid, set, delegate = db.store( set, delegate )
-      xml = LinkStorage.to_xml( aid, set, delegate )
-   when "GET"  # query
-   else
-      raise "unknown operation"
-   end
-   print @cgi.header( 'status' => CGI::HTTP_STATUS['SERVER_ERROR'],
-                      'type' => 'text/xml' )
-   @cgi.print( xml )
+   app = LinkStorage::API.new( @cgi )
+   app.process
 rescue Exception
    if @cgi
       print @cgi.header( 'status' => CGI::HTTP_STATUS['SERVER_ERROR'],
