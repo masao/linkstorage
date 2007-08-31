@@ -45,6 +45,7 @@ module LinkStorage
                @dbh.execute( "DELETE FROM map WHERE aid = ?", aid )
                @dbh.execute( "DELETE FROM delegate WHERE aid = ?", aid )
             end
+            #STDERR.puts [ aid, set, delegate ].inspect
             @dbh.execute( "INSERT INTO delegate VALUES(?, ?)", aid, delegate )
             sth = @dbh.prepare( "INSERT INTO map VALUES(?, ?)" )
             set.each do |e|
