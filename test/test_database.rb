@@ -39,15 +39,3 @@ class TC_DB < Test::Unit::TestCase
       #p db.store( data, data[2] )
    end
 end
-
-class TC_CLIENT < Test::Unit::TestCase
-   def test_initialize
-      assert( LinkStorage::Client.new( "http://localhost/~masao/private/cvswork/linkstorage/api.cgi/example" ) )
-   end
-end
-
-class TC_API_STORE < Test::Unit::TestCase
-   def test_store
-      ENV[ "" ]
-   end
-end
