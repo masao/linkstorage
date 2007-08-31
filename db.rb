@@ -31,6 +31,7 @@ module LinkStorage
 
       def store( set, delegate = nil )
          aid = nil
+         #STDERR.puts [ set, delegate ].inspect
          delegate = set.first if delegate.nil?
          # FIXME: if set.nil? or set.empty?
          # FIXME: if set.inlude? delegate
@@ -50,7 +51,7 @@ module LinkStorage
                sth.execute( aid, e )
             end
          end
-         [ aid, delegate, set ]
+         [ aid, set, delegate ]
       end
    end
    class DBError < Exception; end
