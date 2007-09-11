@@ -43,4 +43,11 @@ class TC_CLIENT < Test::Unit::TestCase
       assert_equal( [ "1", "2", "3", "4" ], data.set )
       assert_equal( "2", data.delegate )
    end
+
+   def test_query
+      client = LinkStorage::Client.new( "http://localhost/~masao/private/cvswork/linkstorage/api.cgi/example", USER, PASSWD )
+      set = [ 1, 2, 3 ]
+      data = client.query( 1 )
+      assert_nil( data )
+   end
 end

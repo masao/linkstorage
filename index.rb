@@ -23,7 +23,12 @@ module LinkStorage
             xml = data.to_xml
          when "GET"  # query
             query = @cgi.params[ "query" ][0]
-            
+            data = @db.query( query )
+            if data.nil?
+               xml = %q[<?xml version="1.0"?><LinkStorage/>]
+            else
+               xml = data.to_xml
+            end
          else
             raise "unknown operation"
          end
