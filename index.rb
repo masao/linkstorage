@@ -19,9 +19,11 @@ module LinkStorage
             set = @cgi.params[ "set" ]
             delegate = @cgi.params[ "delegate" ][0]
             #STDERR.puts [ set, delegate ].inspect
-            aid, set, delegate = @db.store( set, delegate )
-            xml = to_xml( aid, set, delegate )
+            data = @db.store( set, delegate )
+            xml = data.to_xml
          when "GET"  # query
+            query = @cgi.params[ "query" ][0]
+            
          else
             raise "unknown operation"
          end
@@ -29,14 +31,6 @@ module LinkStorage
          print @cgi.header( 'status' => CGI::HTTP_STATUS['OK'],
                             'type' => 'text/xml' )
          @cgi.print( xml )
-      end
-      def to_xml( aid, set, delegate )
-         set_xml = set.map do |e|
-            "<e>#{ CGI.escapeHTML( e ) }</e>"
-         end.join
-         <<EOF
-<?xml version="1.0"?><LinkStorage><set id="#{ aid }">#{ set_xml }</set><delegate>#{ CGI.escapeHTML( delegate ) }</delegate></LinkStorage>
-EOF
       end
    end
    class APIError < Exception; end

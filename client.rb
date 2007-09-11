@@ -5,17 +5,9 @@ require "rexml/document"
 require "net/http"
 Net::HTTP.version_1_2
 
+require "data.rb"
+
 module LinkStorage
-   class Data
-      attr_reader :set, :delegate
-      def initialize( xml )
-         doc = REXML::Document.new( xml )
-         @set = doc.elements.to_a( "/LinkStorage/set/e" ).map do |e|
-            e.text
-         end
-         @delegate = doc.get_elements( "/LinkStorage/delegate" )[0].text
-      end
-   end
    class Client
       def initialize( baseurl, user = nil, password = nil )
          @baseurl = baseurl
@@ -32,10 +24,11 @@ module LinkStorage
             header = { "Authorization" => "Basic " + auth }
          end
          response = http.post( @uri.path, data, header )
+         #p response.body
          unless response.code == "200"
             raise "error"
          end
-         Data.new( response.body )
+         Data.load_xml( response.body )
       end
    end
 end

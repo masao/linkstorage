@@ -4,6 +4,8 @@
 require 'ftools'
 require 'sqlite3'
 
+require "data.rb"
+
 module LinkStorage
    class DB
       CREATE_TABLE = <<-EOF
@@ -52,7 +54,25 @@ module LinkStorage
                sth.execute( aid, e )
             end
          end
-         [ aid, set, delegate ]
+         Data.new( aid, set, delegate )
+      end
+
+      def query( query )
+         data = nil
+         aid = nil
+         set = []
+         delegate = nil
+         @dbh.transaction do
+            aid  = @dbh.get_first_value( "SELECT aid FROM map WHERE id = ?", query )
+            unless aid.nil?
+               delegate = @dbh.get_first_value( "SELECT id FROM delegate WHERE aid = ?", aid )
+               @dbh.execute( "SELECT id FROM map WHERE aid = ?", aid ) do |row|
+                  set << row[0]
+               end
+               data = Data.new( aid, set, delegate )
+            end
+         end
+         data
       end
    end
    class DBError < Exception; end

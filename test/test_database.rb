@@ -29,13 +29,29 @@ class TC_DB < Test::Unit::TestCase
    def test_store
       db = LinkStorage::DB.new( "example" )
       data = [ 1, 2, 3 ]
-      assert( db.store( data ) )
+      assert( result = db.store( data ) )
+      assert_equal( [1, 2, 3], result.set )
 
       data << 4
-      assert( db.store( data ) )
+      result = db.store( data )
+      assert_equal( [1, 2, 3, 4], result.set )
 
       data << 5
-      assert( db.store( data, data[2] ) )
-      #p db.store( data, data[2] )
+      result = db.store( data )
+      assert_equal( [1, 2, 3, 4, 5], result.set )
+      assert_equal( 1, result.delegate )
+   end
+
+   def test_query
+      db = LinkStorage::DB.new( "example" )
+      assert_nil( db.query( 1 ) )
+
+      data = [ 1, 2, 3 ]
+      db.store( data )
+      data = db.query( 1 )
+      #p data
+      assert_equal( "1", data.aid )
+      assert_equal( %w[ 1 2 3 ], data.set )
+      assert_equal( "1", data.delegate )
    end
 end
