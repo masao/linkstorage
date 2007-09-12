@@ -51,12 +51,7 @@ rescue Exception
                          'type' => 'text/html' )
    else
       print "Status: 500 Internal Server Error\n"
-      print "Content-Type: text/html\n\n"
+      print "Content-Type: text/xml\n\n"
    end
-   puts "<h1>500 Internal Server Error</h1>"
-   puts "<pre>"
-   puts CGI::escapeHTML( "#{$!} (#{$!.class})" )
-   puts ""
-   puts CGI::escapeHTML( $@.join( "\n" ) )
-   puts "</pre>"
+   puts %Q[<?xml version="1.0"?><LinkStorage><error>#{CGI::escapeHTML( "#{$!} (#{$!.class})" )}\n#{CGI::escapeHTML( $@.join( "\n" ) )}</error></LinkStorage>]
 end
