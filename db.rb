@@ -78,11 +78,11 @@ module LinkStorage
 
       def delete( set )
          result = query( set[0] )
-         if result.set === set
+         if result and result.set === set
             @dbh.execute( "DELETE FROM map WHERE aid = ?", result.aid )
             @dbh.execute( "DELETE FROM delegate WHERE aid = ?", result.aid )
          else
-            raise DBError, "DELETE failure: The given set was not the same as the stored set: #{set.inspect} != #{result.set.inspect}"
+            raise DBError, "DELETE failure: The given set was not the same as the stored set: #{set.inspect} != #{result.inspect}"
          end
       end
    end

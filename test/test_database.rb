@@ -66,6 +66,7 @@ class TC_DB < Test::Unit::TestCase
       db = LinkStorage::DB.new( "example" )
       data = [ "1", "2", "3" ]
       db.store( data )
+      assert_raise(LinkStorage::DBError){  db.delete( "1" )  }
       db.delete( data )
       assert_nil( db.query( data[0] ) )
    end
