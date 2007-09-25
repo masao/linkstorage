@@ -40,6 +40,13 @@ class TC_DB < Test::Unit::TestCase
       result = db.store( data )
       assert_equal( [1, 2, 3, 4, 5], result.set )
       assert_equal( 1, result.delegate )
+
+      data = [ "6" ]
+      assert_nothing_raised do
+         result = db.store( data )
+      end
+      assert_equal( [ "6" ], result.set )
+      assert_equal( "6", result.delegate )
    end
 
    def test_query
@@ -53,5 +60,13 @@ class TC_DB < Test::Unit::TestCase
       assert_equal( "1", data.aid )
       assert_equal( %w[ 1 2 3 ], data.set )
       assert_equal( "1", data.delegate )
+   end
+
+   def test_delete
+      db = LinkStorage::DB.new( "example" )
+      data = [ "1", "2", "3" ]
+      db.store( data )
+      db.delete( data )
+      assert_nil( db.query( data[0] ) )
    end
 end

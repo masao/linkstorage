@@ -40,6 +40,7 @@ module LinkStorage
          @dbh.transaction do
             aid = @dbh.get_first_value( "SELECT aid FROM map WHERE id = ?",
                                         set[0] )
+            #STDERR.puts aid
             if aid.nil?
                aid = @dbh.get_first_value( "SELECT max(aid) FROM map" ).to_i
                aid += 1
@@ -74,7 +75,18 @@ module LinkStorage
          end
          data
       end
+
+      def delete( set )
+         result = query( set[0] )
+         if result.set === set
+            @dbh.execute( "DELETE FROM map WHERE aid = ?", result.aid )
+            @dbh.execute( "DELETE FROM delegate WHERE aid = ?", result.aid )
+         else
+            raise DBError, "DELETE failure: The given set was not the same as the stored set: #{set.inspect} != #{result.set.inspect}"
+         end
+      end
    end
+
    class DBError < Exception; end
 end
 

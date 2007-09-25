@@ -29,6 +29,9 @@ module LinkStorage
             else
                xml = data.to_xml
             end
+         when "DELETE"
+            set = @cgi.params[ "set" ]
+            data = @db.delete( set )
          else
             raise "unknown operation"
          end
