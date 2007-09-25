@@ -46,8 +46,19 @@ class TC_CLIENT < Test::Unit::TestCase
 
    def test_query
       client = LinkStorage::Client.new( "http://localhost/~masao/private/cvswork/linkstorage/api.cgi/example", USER, PASSWD )
-      set = [ 1, 2, 3 ]
+      set = [ "1", "2", "3" ]
       data = client.query( 1 )
       assert_nil( data )
+      client.save( set )
+      data = client.query( "1" )
+      assert_equal( data.set, set )
+   end
+
+   def test_delete
+      client = LinkStorage::Client.new( "http://localhost/~masao/private/cvswork/linkstorage/api.cgi/example", USER, PASSWD )
+      set = [ "1", "2", "3" ]
+      client.save( set )
+      client.delete( set )
+      assert_nil( client.query( set[0] ) )
    end
 end

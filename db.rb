@@ -84,6 +84,7 @@ module LinkStorage
          else
             raise DBError, "DELETE failure: The given set was not the same as the stored set: #{set.inspect} != #{result.inspect}"
          end
+         result
       end
    end
 

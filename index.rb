@@ -14,26 +14,29 @@ module LinkStorage
          @db = LinkStorage::DB.new( @namespace )
       end
       def process
+         data = nil
          case @cgi.request_method
          when "POST" # store/update
             set = @cgi.params[ "set" ]
             delegate = @cgi.params[ "delegate" ][0]
             #STDERR.puts [ set, delegate ].inspect
             data = @db.store( set, delegate )
-            xml = data.to_xml
          when "GET"  # query
             query = @cgi.params[ "query" ][0]
             data = @db.query( query )
-            if data.nil?
-               xml = %q[<?xml version="1.0"?><LinkStorage/>]
-            else
-               xml = data.to_xml
-            end
-         when "DELETE"
+         when "DELETE"	# delete
+            #STDERR.puts ENV.inspect
+            @cgi.params = CGI::parse( ENV["QUERY_STRING"] )
             set = @cgi.params[ "set" ]
+            #STDERR.puts "**"+set.inspect
             data = @db.delete( set )
          else
             raise "unknown operation"
+         end
+         if data.nil?
+            xml = %q[<?xml version="1.0"?><LinkStorage/>]
+         else
+            xml = data.to_xml
          end
          raise APIError, "unknown error while API processing." if xml.nil?
          print @cgi.header( 'status' => CGI::HTTP_STATUS['OK'],

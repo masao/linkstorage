@@ -21,6 +21,10 @@ module LinkStorage
       def query( query )
          @http.request( :get, "query=#{query}" )
       end
+      def delete( set )
+         data = set.map{|e| "set=#{e}" }.join("&")
+         @http.request( :delete, data )
+      end
 
       class HTTPConnection
          def initialize( baseurl, user = nil, password = nil )
@@ -39,6 +43,8 @@ module LinkStorage
                response = @http.post( @uri.path, data, header )
             when :get
                response = @http.get( @uri.path + "?" + data, header )
+            when :delete
+               response = @http.delete( @uri.path + "?" + data, header )
             else
                raise "unknown request method"
             end
