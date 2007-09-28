@@ -38,15 +38,16 @@ module LinkStorage
          # FIXME: if set.nil? or set.empty?
          # FIXME: if set.inlude? delegate
          @dbh.transaction do
-            aid = @dbh.get_first_value( "SELECT aid FROM map WHERE id = ?",
-                                        set[0] )
-            #STDERR.puts aid
+            set.each do |e|
+               aid = @dbh.get_first_value( "SELECT aid FROM map WHERE id = ?",
+                                           e )
+               @dbh.execute( "DELETE FROM map WHERE aid = ?", aid )
+               @dbh.execute( "DELETE FROM delegate WHERE aid = ?", aid )
+               #STDERR.puts aid
+            end
             if aid.nil?
                aid = @dbh.get_first_value( "SELECT max(aid) FROM map" ).to_i
                aid += 1
-            else
-               @dbh.execute( "DELETE FROM map WHERE aid = ?", aid )
-               @dbh.execute( "DELETE FROM delegate WHERE aid = ?", aid )
             end
             #STDERR.puts [ aid, set, delegate ].inspect
             @dbh.execute( "INSERT INTO delegate VALUES(?, ?)", aid, delegate )
