@@ -33,6 +33,7 @@ module LinkStorage
             @user, @password = user, password
          end
          def request( method, data = nil )
+            @http.start if not @http.active?
             response = nil
             if not @user.nil? and not @password.nil?
                auth = [ "#{@user}:#{@password}" ].pack('m').gsub(/\n/, '')
