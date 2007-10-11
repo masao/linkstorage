@@ -47,6 +47,14 @@ class TC_DB < Test::Unit::TestCase
       end
       assert_equal( [ "6" ], result.set )
       assert_equal( "6", result.delegate )
+
+      data = [ "1", "6" ]
+      result = db.store( data )
+      assert_equal( [ "1", "6" ], result.set )
+      result = db.query( "6" )
+      assert_equal( [ "1", "6" ], result.set )
+      result = db.query( "1" )
+      assert_equal( [ "1", "6" ], result.set )
    end
 
    def test_query
